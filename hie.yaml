@@ -1,0 +1,4 @@
+cradle:
+    stack:
+        - path: "./generator/Main.hs"
+          component: "blog:exe:blog"
