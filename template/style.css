@@ -122,6 +122,15 @@ main > article {
     width: 1.2em;
 }
 
+#toc-label {
+    width: 100%;
+    cursor: pointer;
+}
+
+#toc-label span {
+    margin-left: 0.2em;
+}
+
 #toc {
     background-color: #1a2634;
     font-size: 1.5em;
@@ -130,6 +139,7 @@ main > article {
 
 #toc ul {
     list-style: none;
+    display: none;
 }
 
 #toc li {
@@ -137,12 +147,21 @@ main > article {
     margin-bottom: 0.2rem;
 }
 
-#toc h2 {
-    margin-bottom: 1rem;
+#toc svg {
+    height: 1em;
+    transform: translate(10%, 15%);
 }
 
 #toc a + ul {
     margin-left: 1rem;
+}
+
+#toc-toggle + ul {
+    margin-top: 1rem;
+}
+
+#toc-toggle:checked + ul {
+    display: block;
 }
 
 article h2 {
