@@ -1,6 +1,6 @@
 module Main (main) where
 
-import Data.Aeson (FromJSON, ToJSON, Value (..), object, (.=))
+import Data.Aeson (FromJSON, ToJSON (..), Value (..), object, (.=))
 import Data.Aeson.Optics (key, values, _Object, _String)
 import Data.Binary (Binary)
 import Data.Functor (void)
@@ -8,7 +8,7 @@ import Data.Functor.Identity (Identity (runIdentity))
 import qualified Data.HashMap.Strict as HM
 import Data.Maybe (fromJust, fromMaybe)
 import Data.Text (Text, pack, splitOn, strip, unpack)
-import Development.Shake (Action, ShakeOptions (..), Verbosity (..), copyFileChanged, forP, getDirectoryFiles, liftIO, readFile', shakeOptions, writeFile')
+import Development.Shake (Action, ShakeOptions (..), Verbosity (..), copyFileChanged, forP, getDirectoryFiles, liftIO, parallel, readFile', shakeOptions, writeFile')
 import Development.Shake.FilePath (dropExtension, (</>))
 import Development.Shake.Forward (forwardOptions, shakeArgsForward)
 import GHC.Generics (Generic)
@@ -37,8 +37,17 @@ data Post = MkPost
     author :: String,
     content :: String,
     category :: String,
+    description :: String,
     date :: String,
+    url :: String,
     tags :: [Tag]
+  }
+  deriving stock (Generic, Eq, Ord, Show)
+  deriving anyclass (FromJSON, ToJSON, Binary)
+
+data PostList = MkPostList
+  { posts :: [Post],
+    heading :: String
   }
   deriving stock (Generic, Eq, Ord, Show)
   deriving anyclass (FromJSON, ToJSON, Binary)
@@ -72,12 +81,28 @@ buildPost tmpl tagList srcPath = do
           ( \t ->
               object ["name" .= t, "html" .= fromJust (lookup (strip . fromJust $ t ^? _String) tagList)]
           )
-      fullData = setYear . setTags . setCategory $ postData
+      postUrl = dropExtension srcPath </> "index.html"
+      setPostUrl = over _Object (HM.insert "url" (String $ "/" <> pack postUrl))
+      fullData = setYear . setTags . setCategory . setPostUrl $ postData
 
   template <- compileTemplate' "template/post.html"
-  writeFile' (outputFolder </> dropExtension srcPath </> "index.html") . unpack $ substitute template fullData
+  writeFile' (outputFolder </> postUrl) . unpack $ substitute template fullData
 
   convert fullData
+
+buildPostsLists :: [Post] -> Action [PostList]
+buildPostsLists postList = parallel $
+  flip map ["programming", "cooking", "reviews", "all"] $ \cat -> do
+    liftIO . putStrLn $ "Building post list for category " <> cat
+    let p = filter (\x -> cat == "all" || category x == cat) postList
+        h = if cat == "all" then "All posts" else "All posts in '" <> cat <> "'"
+        result = MkPostList p h
+        file = if cat == "all" then "index.html" else cat </> "index.html"
+
+    template <- compileTemplate' "template/postList.html"
+    writeFile' (outputFolder </> file) . unpack $ substitute template (toJSON result)
+
+    pure result
 
 loadPandocTemplate :: Action (Template Text)
 loadPandocTemplate = do
@@ -107,9 +132,7 @@ copyStaticFiles = do
       copyFileChanged ("template" </> p) (outputFolder </> p)
 
 buildRules :: Action ()
-buildRules = do
-  _ <- buildPosts
-  copyStaticFiles
+buildRules = (buildPosts >>= buildPostsLists) *> copyStaticFiles
 
 main :: IO ()
 main = shakeArgsForward shOpts buildRules
