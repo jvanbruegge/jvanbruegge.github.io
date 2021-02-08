@@ -32,7 +32,6 @@ stack.yaml.lock
 [._]s[a-v][a-z]
 [._]sw[a-p]
 *~
-tags
 
 # IntellijIDEA
 .idea/
