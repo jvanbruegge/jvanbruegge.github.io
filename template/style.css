@@ -215,7 +215,8 @@ main a {
     border-radius: 50%;
 }
 
-#copyright {
+#copyright,
+#impressum {
     font-size: 0.4em;
     color: grey;
 }

@@ -99,7 +99,7 @@ buildPosts = do
 
 copyStaticFiles :: Action ()
 copyStaticFiles = do
-  paths <- getDirectoryFiles "./template" ["images//*", "//*.css"]
+  paths <- getDirectoryFiles "./template" ["images//*", "//*.css", "impressum.html"]
   void $
     forP paths $ \p ->
       copyFileChanged ("template" </> p) (outputFolder </> p)
