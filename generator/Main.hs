@@ -79,7 +79,7 @@ buildPost tmpl tagList srcPath = do
         over
           (key "tags" % values)
           ( \t ->
-              object ["name" .= t, "html" .= fromJust (lookup (strip . fromJust $ t ^? _String) tagList)]
+              object ["name" .= over _String strip t, "html" .= fromJust (lookup (strip . fromJust $ t ^? _String) tagList)]
           )
       postUrl = dropExtension srcPath </> "index.html"
       setPostUrl = over _Object (HM.insert "url" (String $ "/" <> pack postUrl))
@@ -104,6 +104,19 @@ buildPostsLists postList = parallel $
 
     pure result
 
+buildTagLists :: [(Text, Text)] -> [Post] -> Action [PostList]
+buildTagLists tagList postList = parallel $
+  flip map (map fst tagList) $ \tag -> do
+    liftIO . putStrLn $ "Building post list for tag " <> unpack tag
+    let p = filter (\x -> unpack tag `elem` map name (tags x)) postList
+        h = "All posts in tag '" <> unpack tag <> "'"
+        result = MkPostList p h
+
+    template <- compileTemplate' "template/postList.html"
+    writeFile' (outputFolder </> "tags" </> unpack tag </> "index.html") . unpack $ substitute template (toJSON result)
+
+    pure result
+
 loadPandocTemplate :: Action (Template Text)
 loadPandocTemplate = do
   template <- pack <$> readFile' "template/article.html"
@@ -117,11 +130,10 @@ loadTags = do
     h <- readFile' $ "template/tags" </> p
     pure (pack (dropExtension p), pack h)
 
-buildPosts :: Action [Post]
-buildPosts = do
+buildPosts :: [(Text, Text)] -> Action [Post]
+buildPosts tagList = do
   tmpl <- loadPandocTemplate
   paths <- getDirectoryFiles "articles" ["//*.md"]
-  tagList <- loadTags
   forP paths (buildPost tmpl tagList)
 
 copyStaticFiles :: Action ()
@@ -132,7 +144,12 @@ copyStaticFiles = do
       copyFileChanged ("template" </> p) (outputFolder </> p)
 
 buildRules :: Action ()
-buildRules = (buildPosts >>= buildPostsLists) *> copyStaticFiles
+buildRules = do
+  tagList <- loadTags
+  postList <- buildPosts tagList
+  _ <- buildPostsLists postList
+  _ <- buildTagLists tagList postList
+  copyStaticFiles
 
 main :: IO ()
 main = shakeArgsForward shOpts buildRules

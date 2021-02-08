@@ -235,6 +235,11 @@ main a {
     margin-bottom: 2em;
 }
 
+#intro a {
+    color: var(--highlight-color);
+    text-decoration: none;
+}
+
 #page-header > * + * {
     margin-top: 1em;
 }
