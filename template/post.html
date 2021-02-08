@@ -10,7 +10,9 @@
         {{> template/header.html}}
         <main>
             <header id="article-header">
-                <a id="category" href="/categories/programming">programming</a>
+                <a id="category" href="/categories/{{category}}">
+                    {{category}}
+                </a>
                 <h1>{{title}}</h1>
                 <div id="tags">
                     <!-- prettier-ignore -->

@@ -1,7 +1,7 @@
 module Main (main) where
 
 import Data.Aeson (FromJSON, ToJSON, Value (..), object, (.=))
-import Data.Aeson.Optics (key, values, _String)
+import Data.Aeson.Optics (key, values, _Object, _String)
 import Data.Binary (Binary)
 import Data.Functor (void)
 import Data.Functor.Identity (Identity (runIdentity))
@@ -36,6 +36,7 @@ data Post = MkPost
   { title :: String,
     author :: String,
     content :: String,
+    category :: String,
     date :: String,
     tags :: [Tag]
   }
@@ -61,18 +62,19 @@ buildPost tmpl tagList srcPath = do
   liftIO . putStrLn $ "Rebuilding post: " <> srcPath
   postMarkdown <- readFile' $ "articles" </> srcPath
   postData <- markdownToHTML tmpl . pack $ postMarkdown
-  (year : _) <- pure . splitOn "/" . pack $ srcPath
+  (year : cat : _) <- pure . splitOn "/" . pack $ srcPath
 
   let setYear = over (key "date" % _String) (<> ", " <> year)
+      setCategory = over _Object (HM.insert "category" (String cat))
       setTags =
         over
           (key "tags" % values)
           ( \t ->
               object ["name" .= t, "html" .= fromJust (lookup (strip . fromJust $ t ^? _String) tagList)]
           )
-      fullData = setYear . setTags $ postData
+      fullData = setYear . setTags . setCategory $ postData
 
-  template <- compileTemplate' "template/index.html"
+  template <- compileTemplate' "template/post.html"
   writeFile' (outputFolder </> dropExtension srcPath </> "index.html") . unpack $ substitute template fullData
 
   convert fullData
