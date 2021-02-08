@@ -1,0 +1,38 @@
+name: Build
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Install stack
+        uses: haskell/actions/setup@v1
+        with:
+            enable-stack: true
+
+      - name: Cache stack store
+        uses: actions/cache@v1
+        with:
+          path: ~/.stack
+          key: stack-cache-${{ hashFiles('stack.yaml') }}-${{ hashFiles('blog.cabal') }}
+          restore-keys: |
+            stack-cache-
+
+      - name: Build site generator
+        run: stack build
+
+      - name: Run site generator
+        run: stack exec blog
+
+      - name: Deploy to github pages
+        uses: JamesIves/github-pages-deploy-action@4.0.0
+        with:
+            branch: gh-pages
+            folder: docs
