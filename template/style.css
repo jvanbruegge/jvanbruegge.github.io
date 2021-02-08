@@ -216,7 +216,9 @@ main a {
 }
 
 #copyright,
+#copyright a,
 #impressum {
-    font-size: 0.4em;
+    text-align: center;
+    font-size: 0.5rem;
     color: grey;
 }
