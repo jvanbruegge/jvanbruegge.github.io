@@ -128,11 +128,28 @@ main > article {
     font-weight: bold;
 }
 
+#toc ul {
+    list-style: none;
+}
+
+#toc li {
+    font-size: 0.8em;
+    margin-bottom: 0.2rem;
+}
+
+#toc h2 {
+    margin-bottom: 1rem;
+}
+
+#toc a + ul {
+    margin-left: 1rem;
+}
+
 article h2 {
     margin: 1.2em 0 0.6em 0;
 }
 
-article a {
+main a {
     color: var(--highlight-color);
     text-decoration: none;
 }

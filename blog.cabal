@@ -26,10 +26,12 @@ common common-options
                      , aeson-optics
                      , binary
                      , optics
+                     , pandoc
                      , shake
                      , slick
                      , text
                      , time
+                     , unordered-containers
 
   ghc-options:         -Wall
                        -Wcompat
