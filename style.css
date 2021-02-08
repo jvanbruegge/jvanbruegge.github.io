@@ -1,0 +1,257 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    color: white;
+}
+
+html {
+    font-family: "sans-serif";
+    --header-color: #320b93;
+    --highlight-color: #ea4e10;
+    --dark-backgroud: #0d1219;
+}
+
+body {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 18em 1fr;
+    width: 100%;
+    height: 100vh;
+}
+
+.hl {
+    color: var(--highlight-color);
+}
+
+#page-header {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    background-color: var(--header-color);
+    padding: 1em;
+    font-size: 1.5em;
+}
+
+#article-header {
+    height: 10em;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+        url("./images/stock_code.jpg");
+}
+
+#article-header h1 {
+    margin-bottom: 0.3em;
+    text-shadow: 2px 2px 4px black;
+    font-size: 2.4em;
+}
+
+#category {
+    font-size: 0.8em;
+    color: var(--highlight-color);
+}
+
+#tags {
+    display: flex;
+    flex-direction: row;
+    height: 1.2em;
+    width: auto;
+}
+
+#date {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 1.2em;
+    margin-top: 0.5em;
+}
+
+#home {
+    text-decoration: none;
+}
+
+#postList {
+    grid-column: 1;
+    grid-row: 3;
+}
+
+#postList h2 {
+    margin-bottom: 0.1rem;
+}
+
+#toc-placeholder {
+    width: 100%;
+    background-color: #1a2634;
+    padding: calc(1rem + 1rem * 30 / 32);
+}
+
+.date {
+    color: gray;
+}
+
+.description {
+    margin-top: 0.4rem;
+    display: block;
+}
+
+main {
+    display: grid;
+    grid-template-columns: 60% 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-auto-flow: column;
+    overflow: auto;
+    background-color: var(--dark-backgroud);
+}
+
+main > * {
+    padding: 1rem 2rem;
+    grid-column: span 2;
+}
+
+main > article {
+    grid-column: 1;
+    grid-row: 3;
+    text-align: justify;
+}
+
+#spaceholder {
+    grid-column: 2;
+    grid-row: 3;
+    background-color: var(--dark-backgroud);
+}
+
+#date svg {
+    width: 1.2em;
+    height: 100%;
+}
+
+#date * + * {
+    margin-left: 0.4em;
+}
+
+.tag {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 3px;
+    border-radius: 3px;
+    font-size: 0.8em;
+    text-decoration: none;
+    width: min-content;
+}
+.tag span {
+    margin-left: 0.2em;
+    white-space: nowrap;
+}
+
+#tags svg {
+    height: 100%;
+    width: 1.2em;
+}
+
+#toc-label {
+    width: 100%;
+    cursor: pointer;
+}
+
+#toc-label span {
+    margin-left: 0.2em;
+}
+
+#toc {
+    background-color: #1a2634;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+#toc ul {
+    list-style: none;
+    display: none;
+}
+
+#toc li {
+    font-size: 0.8em;
+    margin-bottom: 0.2rem;
+}
+
+#toc svg {
+    height: 1em;
+    transform: translate(10%, 15%);
+}
+
+#toc a + ul {
+    margin-left: 1rem;
+}
+
+#toc-toggle + ul {
+    margin-top: 1rem;
+}
+
+#toc-toggle:checked + ul {
+    display: block;
+}
+
+article h2 {
+    margin: 1.2em 0 0.6em 0;
+}
+
+main a {
+    color: var(--highlight-color);
+    text-decoration: none;
+}
+
+#tags > * + * {
+    margin-left: 0.5em;
+}
+
+#name {
+    font-size: 1.4em;
+    font-weight: bold;
+}
+
+#socials {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 2em;
+}
+
+#socials a {
+    width: 2em;
+}
+
+#socials svg {
+    height: 100%;
+}
+
+#page-header img {
+    width: 100%;
+}
+
+#page-header p {
+    text-align: center;
+    color: #cecece;
+    margin-bottom: 2em;
+}
+
+#intro a {
+    color: var(--highlight-color);
+    text-decoration: none;
+}
+
+#page-header > * + * {
+    margin-top: 1em;
+}
+
+#portrait {
+    border-radius: 50%;
+}
+
+#copyright,
+#copyright a,
+#impressum {
+    text-align: center;
+    font-size: 0.5rem;
+    color: grey;
+}
