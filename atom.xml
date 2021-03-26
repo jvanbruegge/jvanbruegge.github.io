@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title type="text">
+        jvanbruegge&#39;s blog
+    </title>
+    <id>
+        https://jvanbruegge.github.io/atom.xml
+    </id>
+    <updated>
+        2021-03-26T20:03:57.888759438Z
+    </updated>
+    <entry>
+        <id>
+            https://jvanbruegge.github.io/2020/programming/open-source-journey/index.html
+        </id>
+        <title type="text">
+            My Open Source Journey
+        </title>
+        <updated>
+            December 19 , 2020
+        </updated>
+        <author>
+            <name>
+                Jan van Brügge
+            </name>
+        </author>
+        <content type="text">
+            It&#39;s October again, Hacktoberfest time. Also time for me to reminisce about my personal learning journey that was so heavily influenced by open source.
+        </content>
+        <link href="https://jvanbruegge.github.io/2020/programming/open-source-journey/index.html"/>
+    </entry>
+    <entry>
+        <id>
+            https://jvanbruegge.github.io/2020/programming/redesigning-a-framework/index.html
+        </id>
+        <title type="text">
+            Redesigning a framework
+        </title>
+        <updated>
+            August 11 , 2020
+        </updated>
+        <author>
+            <name>
+                Jan van Brügge
+            </name>
+        </author>
+        <content type="text">
+            For the last few years, the core team of Cycle.js (André and me) has been redesigning the architecture and the developer experience of the framework. This February we finally found a solution to our problems that still stays true to the core ideas of the framework.
+        </content>
+        <link href="https://jvanbruegge.github.io/2020/programming/redesigning-a-framework/index.html"/>
+    </entry>
+</feed>
