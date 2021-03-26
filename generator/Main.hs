@@ -1,14 +1,14 @@
 module Main (main) where
 
 import Data.Aeson (FromJSON, ToJSON (..), Value (..), object, (.=))
-import Data.Aeson.Optics (key, values, _Object, _String)
+import Data.Aeson.Optics (key, members, values, _Object, _String)
 import Data.Binary (Binary)
 import Data.Functor (void)
 import Data.Functor.Identity (Identity (runIdentity))
 import qualified Data.HashMap.Strict as HM
 import Data.List (sortBy)
 import Data.Maybe (fromJust, fromMaybe)
-import Data.Text (Text, pack, splitOn, strip, unpack)
+import Data.Text (Text, pack, replace, splitOn, strip, unpack)
 import qualified Data.Text.Lazy as LT
 import Data.Time.Clock (getCurrentTime)
 import Data.Time.Format.ISO8601 (iso8601Show)
@@ -28,7 +28,6 @@ import Text.Pandoc.Options (WriterOptions (..), def)
 import Text.Pandoc.Readers (readMarkdown)
 import Text.Pandoc.Templates (Template, compileTemplate)
 import Text.Pandoc.Writers (writeHtml5String, writePlain)
-import Text.XML (rsPretty)
 
 outputFolder :: FilePath
 outputFolder = "docs/"
@@ -91,7 +90,8 @@ buildPost tmpl tagList srcPath = do
           )
       postUrl = dropExtension srcPath </> "index.html"
       setPostUrl = over _Object (HM.insert "url" (String $ "/" <> pack postUrl))
-      fullData = setYear . setTags . setCategory . setPostUrl $ postData
+      fixNewlines = over (members % _String) (replace "\n" " ")
+      fullData = setYear . setTags . setCategory . setPostUrl . fixNewlines $ postData
 
   template <- compileTemplate' "template/post.html"
   writeFile' (outputFolder </> postUrl) . unpack $ substitute template fullData
@@ -155,7 +155,7 @@ buildAtomFeed posts = do
         )
           { Atom.feedEntries = fmap postToEntry posts
           }
-  Just renderedFeed <- pure $ Export.textFeedWith def {rsPretty = True} $ AtomFeed feed
+  Just renderedFeed <- pure $ Export.textFeedWith def $ AtomFeed feed
   writeFile' (outputFolder </> "atom.xml") $ LT.unpack renderedFeed
   where
     postToEntry MkPost {url, title, date, author, description} =

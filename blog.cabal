@@ -33,7 +33,6 @@ common common-options
                      , text
                      , time
                      , unordered-containers
-                     , xml-conduit
 
   ghc-options:         -Wall
                        -Wcompat
