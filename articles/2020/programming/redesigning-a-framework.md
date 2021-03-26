@@ -1,7 +1,7 @@
 ---
 title: Redesigning a framework
 author: Jan van Brügge
-date: August 11
+date: 2020-08-11
 tags: [typescript, open-source]
 description: For the last few years, the core team of Cycle.js ([André](https://twitter.com/andrestaltz) and me) has been redesigning the architecture and the developer experience of the framework. This February we finally found a solution to our problems that still stays true to the core ideas of the framework.
 ---

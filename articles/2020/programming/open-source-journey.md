@@ -1,7 +1,7 @@
 ---
 title: My Open Source Journey
 author: Jan van Brügge
-date: December 19
+date: 2020-12-19
 tags: [open-source]
 description: It's October again, Hacktoberfest time. Also time for me to reminisce about my personal learning journey that was so heavily influenced by open source.
 ---

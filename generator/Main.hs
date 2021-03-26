@@ -78,10 +78,9 @@ buildPost tmpl tagList srcPath = do
   liftIO . putStrLn $ "Rebuilding post: " <> srcPath
   postMarkdown <- readFile' $ "articles" </> srcPath
   postData <- markdownToHTML tmpl . pack $ postMarkdown
-  (year : cat : _) <- pure . splitOn "/" . pack $ srcPath
+  (_ : cat : _) <- pure . splitOn "/" . pack $ srcPath
 
-  let setYear = over (key "date" % _String) (<> ", " <> year)
-      setCategory = over _Object (HM.insert "category" (String cat))
+  let setCategory = over _Object (HM.insert "category" (String cat))
       setTags =
         over
           (key "tags" % values)
@@ -91,7 +90,7 @@ buildPost tmpl tagList srcPath = do
       postUrl = dropExtension srcPath </> "index.html"
       setPostUrl = over _Object (HM.insert "url" (String $ "/" <> pack postUrl))
       fixNewlines = over (members % _String) (replace "\n" " ")
-      fullData = setYear . setTags . setCategory . setPostUrl . fixNewlines $ postData
+      fullData = setTags . setCategory . setPostUrl . fixNewlines $ postData
 
   template <- compileTemplate' "template/post.html"
   writeFile' (outputFolder </> postUrl) . unpack $ substitute template fullData
@@ -163,7 +162,8 @@ buildAtomFeed posts = do
        in (Atom.nullEntry (pack url') (Atom.TextString $ pack title) (pack date))
             { Atom.entryAuthors = [Atom.nullPerson {Atom.personName = pack author}],
               Atom.entryLinks = [Atom.nullLink $ pack url'],
-              Atom.entryContent = Just (Atom.TextContent $ pack description)
+              Atom.entryContent = Just (Atom.TextContent $ pack description),
+              Atom.entryPublished = Just $ pack date
             }
 
 copyStaticFiles :: Action ()
