@@ -25,6 +25,7 @@ common common-options
                      , aeson
                      , aeson-optics
                      , binary
+                     , feed
                      , optics
                      , pandoc
                      , shake
@@ -32,6 +33,7 @@ common common-options
                      , text
                      , time
                      , unordered-containers
+                     , xml-conduit
 
   ghc-options:         -Wall
                        -Wcompat
@@ -51,8 +53,9 @@ common common-options
   default-language:    Haskell2010
 
   default-extensions:  DerivingStrategies
-                     , DeriveGeneric
                      , DeriveAnyClass
+                     , DeriveGeneric
+                     , NamedFieldPuns
                      , OverloadedStrings
                      , TypeApplications
 

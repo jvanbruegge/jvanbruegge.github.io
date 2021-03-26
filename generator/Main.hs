@@ -6,8 +6,12 @@ import Data.Binary (Binary)
 import Data.Functor (void)
 import Data.Functor.Identity (Identity (runIdentity))
 import qualified Data.HashMap.Strict as HM
+import Data.List (sortBy)
 import Data.Maybe (fromJust, fromMaybe)
 import Data.Text (Text, pack, splitOn, strip, unpack)
+import qualified Data.Text.Lazy as LT
+import Data.Time.Clock (getCurrentTime)
+import Data.Time.Format.ISO8601 (iso8601Show)
 import Development.Shake (Action, ShakeOptions (..), Verbosity (..), copyFileChanged, forP, getDirectoryFiles, liftIO, parallel, readFile', shakeOptions, writeFile')
 import Development.Shake.FilePath (dropExtension, (</>))
 import Development.Shake.Forward (forwardOptions, shakeArgsForward)
@@ -15,12 +19,16 @@ import GHC.Generics (Generic)
 import Optics (over, (%), (^?))
 import Slick (compileTemplate', convert, substitute)
 import Slick.Pandoc (PandocReader, PandocWriter, defaultHtml5Options, defaultMarkdownOptions, makePandocReaderWithMetaWriter)
+import qualified Text.Atom.Feed as Atom
+import qualified Text.Feed.Export as Export
+import Text.Feed.Types (Feed (AtomFeed))
 import Text.Pandoc.Class (PandocIO, runIO, setVerbosity)
 import Text.Pandoc.Logging (Verbosity (..))
 import Text.Pandoc.Options (WriterOptions (..), def)
 import Text.Pandoc.Readers (readMarkdown)
 import Text.Pandoc.Templates (Template, compileTemplate)
 import Text.Pandoc.Writers (writeHtml5String, writePlain)
+import Text.XML (rsPretty)
 
 outputFolder :: FilePath
 outputFolder = "docs/"
@@ -136,6 +144,28 @@ buildPosts tagList = do
   paths <- getDirectoryFiles "articles" ["//*.md"]
   forP paths (buildPost tmpl tagList)
 
+buildAtomFeed :: [Post] -> Action ()
+buildAtomFeed posts = do
+  currentDate <- liftIO getCurrentTime
+  let feed =
+        ( Atom.nullFeed
+            "https://jvanbruegge.github.io/atom.xml"
+            (Atom.TextString "jvanbruegge's blog")
+            (pack $ iso8601Show currentDate)
+        )
+          { Atom.feedEntries = fmap postToEntry posts
+          }
+  Just renderedFeed <- pure $ Export.textFeedWith def {rsPretty = True} $ AtomFeed feed
+  writeFile' (outputFolder </> "atom.xml") $ LT.unpack renderedFeed
+  where
+    postToEntry MkPost {url, title, date, author, description} =
+      let url' = "https://jvanbruegge.github.io" <> url
+       in (Atom.nullEntry (pack url') (Atom.TextString $ pack title) (pack date))
+            { Atom.entryAuthors = [Atom.nullPerson {Atom.personName = pack author}],
+              Atom.entryLinks = [Atom.nullLink $ pack url'],
+              Atom.entryContent = Just (Atom.TextContent $ pack description)
+            }
+
 copyStaticFiles :: Action ()
 copyStaticFiles = do
   paths <- getDirectoryFiles "./template" ["images//*", "//*.css", "impressum.html"]
@@ -146,9 +176,10 @@ copyStaticFiles = do
 buildRules :: Action ()
 buildRules = do
   tagList <- loadTags
-  postList <- buildPosts tagList
+  postList <- sortBy (\a b -> compare (date b) (date a)) <$> buildPosts tagList
   _ <- buildPostsLists postList
-  _ <- buildTagLists tagList postList
+  _ <- buildTagLists tagList (take 15 postList)
+  buildAtomFeed postList
   copyStaticFiles
 
 main :: IO ()
